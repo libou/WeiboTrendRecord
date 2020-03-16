@@ -21,7 +21,7 @@ def main():
     try:
         while True:
             now = datetime.now()
-            if now.hour == sched_time[i] and now.min == 0:
+            if now.hour == sched_time[i] and now.minute == 0:
                 scraping()
                 i = (i+1) % len(sched_time)
                 sleep(61 * 60)
