@@ -16,7 +16,6 @@ def main():
 
     try:
         while True:
-            scraping()
             now = datetime.now()
             if now.hour == sched_time[i] and now.min == 0:
                 scraping()
