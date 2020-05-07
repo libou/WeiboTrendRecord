@@ -3,12 +3,12 @@ This program is used for crawling daily hot topics on Weibo
 """
 import os
 import logging
-from data_collection.notification import Notification
-from data_collection.webscraping import scraping
+from notification import Notification
+from webscraping import scraping
 from datetime import datetime
 from time import sleep
 import configparser
-from .proxy.proxy_pool import Proxy
+from proxy.proxy_pool import Proxy
 
 
 def main():
@@ -46,7 +46,7 @@ def main():
                 sleep(1)
     except Exception as e:
         logging.error(e)
-        mailObj.notification(e)
+        mailObj.notification("Error! Please check the log")
 
 
 if __name__ == '__main__':

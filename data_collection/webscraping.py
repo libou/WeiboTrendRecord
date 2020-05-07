@@ -52,10 +52,10 @@ def scraping(proxy, data_dir):
         os.mkdir(os.path.join(data_dir, filename))
 
     df = pd.DataFrame(result, columns=['time', 'rank', 'title', 'count'])
-    if not os.path.exists(os.path.join("data", filename, "record.csv")):
-        df.to_csv(os.path.join("data", filename, "record.csv"), mode='w', index=None, header=True)
+    if not os.path.exists(os.path.join(data_dir, filename, "record.csv")):
+        df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='w', index=None, header=True)
     else:
-        df.to_csv(os.path.join("data", filename, "record.csv"), mode='a', index=None, header=None)
+        df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='a', index=None, header=None)
 
     code = res.status_code
     res.close()
