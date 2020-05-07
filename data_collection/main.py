@@ -31,6 +31,7 @@ def main():
                 while proxy_count > 5:
                     code = scraping(proxy, data_dir)
                     if code == 200:
+                        logging.info("Crawled one record successfully.")
                         break
                     else:
                         inst_proxy.delete_proxy(proxy)
