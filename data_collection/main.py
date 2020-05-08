@@ -42,7 +42,7 @@ def main():
                     logging.warning("The number of available proxy ip is {}".format(proxy_count))
                     mailObj.notification("The number of available proxy ip is {}".format(proxy_count))
                     inst_proxy = Proxy("proxy/proxy.txt")
-                sleep(61 * 60)
+                sleep(61)
             else:
                 sleep(1)
     except Exception as e:
