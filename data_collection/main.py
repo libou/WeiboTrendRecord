@@ -9,6 +9,7 @@ from datetime import datetime
 from time import sleep
 import configparser
 from proxy.proxy_pool import Proxy
+from kafka_configuration import KafkaObj
 
 
 def main():
@@ -56,12 +57,19 @@ if __name__ == '__main__':
     conf = configparser.ConfigParser()
     conf.read(config_file)
 
+    # 邮件通知配置
     sender = conf.get("notification", "sender")
     pw = conf.get("notification", "passwd")
     receiver = conf.get("notification", "receiver")
 
+    # 日志配置
     log_dir = conf.get("web_scraping", "log_dir")
     data_dir = conf.get("web_scraping", "data_dir")
+
+    # kafka配置
+    kafka_server = conf.get("kafka", "server")
+    kafka_topic = conf.get("kafka", "topic")
+    kafka_obj = KafkaObj(kafka_server, kafka_topic)
 
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
