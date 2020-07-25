@@ -30,7 +30,7 @@ def main():
                 proxy = inst_proxy.get_proxy()
                 proxy_count = inst_proxy.get_proxies_num()
                 while proxy_count > 5:
-                    code = scraping(proxy, data_dir)
+                    code = scraping(proxy, data_dir, kafka_obj)
                     if code == 200:
                         logging.info("Crawled one record successfully.")
                         break
