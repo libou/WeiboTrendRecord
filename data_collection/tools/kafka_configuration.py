@@ -27,4 +27,4 @@ class KafkaObj(object):
             return 200
         except Exception as e:
             logging.error("ERROR: write kafka error：{}".format(e))
-            return 500
+            return 9092

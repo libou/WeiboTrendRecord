@@ -1,5 +1,5 @@
 import requests
-from .proxy_pool import Proxy
+from proxy.proxy_pool import Proxy
 
 
 def test_proxy(proxy, https_url):
@@ -10,7 +10,7 @@ def test_proxy(proxy, https_url):
         res = requests.post(https_url, headers=headers, proxies=proxies)
         content = res.content.decode("utf-8")
 
-        print(content)
+        # print(content)
         if res.status_code == 200:
             return True
         return False
@@ -41,7 +41,7 @@ def doTest():
             print("Wrong Proxy: {}".format(proxy))
             remove_list.append(proxy)
             inst.delete_proxy(proxy)
-    delete_proxy(remove_list)
+    # delete_proxy(remove_list)
     print("Total Count of Wrong Proxies: {}".format(count))
     print("Bad proxies have been removed.")
     print("# of rest available proxies: {}".format(inst.get_proxies_num()))
@@ -51,6 +51,5 @@ def doTest():
     #         for i in range(5):
     #             proxy_list = get_proxy(i + 1)
     #             file.writelines("%s\n" % proxy for proxy in proxy_list)
-
 
 
