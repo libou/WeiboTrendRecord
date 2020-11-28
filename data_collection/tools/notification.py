@@ -31,6 +31,7 @@ class Notification(object):
             smtpObj.login(self._sender, self._pw)
             smtpObj.sendmail(self._sender, self._receiver, message.as_string())
             print("邮件发送成功")
+            smtpObj.close()
             logging.info("Notification sended successfully")
         except smtplib.SMTPException as e:
             print(e)

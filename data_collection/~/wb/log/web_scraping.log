@@ -1,0 +1,18 @@
+2020-11-28 10:18:25,340 - main.py[line:109] - INFO: WeiboTrendRecord launching
+2020-11-28 10:23:25,429 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:381] - INFO: <BrokerConnection node_id=0 host=localhost:9092 <connecting> [IPv6 ('::1', 9092, 0, 0)]>: connecting to localhost:9092 [('::1', 9092, 0, 0) IPv6]
+2020-11-28 10:23:25,430 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:410] - INFO: <BrokerConnection node_id=0 host=localhost:9092 <connecting> [IPv6 ('::1', 9092, 0, 0)]>: Connection complete.
+2020-11-28 10:23:25,431 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:919] - INFO: <BrokerConnection node_id=bootstrap-0 host=127.0.0.1:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2020-11-28 10:56:14,828 - /usr/local/lib/python3.7/site-packages/kafka/producer/kafka.py[line:483] - INFO: Closing the Kafka producer with 0 secs timeout.
+2020-11-28 10:56:14,829 - /usr/local/lib/python3.7/site-packages/kafka/producer/kafka.py[line:501] - INFO: Proceeding to force close the producer since pending requests could not be completed within timeout 0.
+2020-11-28 14:10:18,902 - main.py[line:109] - INFO: WeiboTrendRecord launching
+2020-11-28 14:15:18,967 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:381] - INFO: <BrokerConnection node_id=0 host=localhost:9092 <connecting> [IPv6 ('::1', 9092, 0, 0)]>: connecting to localhost:9092 [('::1', 9092, 0, 0) IPv6]
+2020-11-28 14:15:18,969 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:410] - INFO: <BrokerConnection node_id=0 host=localhost:9092 <connecting> [IPv6 ('::1', 9092, 0, 0)]>: Connection complete.
+2020-11-28 14:15:18,971 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:919] - INFO: <BrokerConnection node_id=bootstrap-0 host=127.0.0.1:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2020-11-28 14:46:06,127 - /usr/local/lib/python3.7/site-packages/kafka/producer/kafka.py[line:483] - INFO: Closing the Kafka producer with 0 secs timeout.
+2020-11-28 14:46:06,128 - /usr/local/lib/python3.7/site-packages/kafka/producer/kafka.py[line:501] - INFO: Proceeding to force close the producer since pending requests could not be completed within timeout 0.
+2020-11-28 14:53:06,598 - main.py[line:109] - INFO: WeiboTrendRecord launching
+2020-11-28 14:54:01,196 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:381] - INFO: <BrokerConnection node_id=0 host=localhost:9092 <connecting> [IPv6 ('::1', 9092, 0, 0)]>: connecting to localhost:9092 [('::1', 9092, 0, 0) IPv6]
+2020-11-28 14:54:01,196 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:410] - INFO: <BrokerConnection node_id=0 host=localhost:9092 <connecting> [IPv6 ('::1', 9092, 0, 0)]>: Connection complete.
+2020-11-28 14:54:01,197 - /usr/local/lib/python3.7/site-packages/kafka/conn.py[line:919] - INFO: <BrokerConnection node_id=bootstrap-0 host=127.0.0.1:9092 <connected> [IPv4 ('127.0.0.1', 9092)]>: Closing connection. 
+2020-11-28 14:54:52,753 - /usr/local/lib/python3.7/site-packages/kafka/producer/kafka.py[line:483] - INFO: Closing the Kafka producer with 0 secs timeout.
+2020-11-28 14:54:52,754 - /usr/local/lib/python3.7/site-packages/kafka/producer/kafka.py[line:501] - INFO: Proceeding to force close the producer since pending requests could not be completed within timeout 0.

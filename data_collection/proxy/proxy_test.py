@@ -1,5 +1,6 @@
 import requests
 from proxy.proxy_pool import Proxy
+from tqdm import tqdm
 
 
 def test_proxy(proxy, https_url):
@@ -7,7 +8,7 @@ def test_proxy(proxy, https_url):
 
     try:
         proxies = {"http": proxy}
-        res = requests.post(https_url, headers=headers, proxies=proxies)
+        res = requests.post(https_url, headers=headers, proxies=proxies, timeout=1)
         content = res.content.decode("utf-8")
 
         # print(content)
@@ -21,29 +22,29 @@ def test_proxy(proxy, https_url):
 
 
 def delete_proxy(proxy_list):
-    with open("proxy.txt") as file:
+    with open("/Users/libou/Code/Projects/WeiboTrendRecord/data_collection/proxy/proxy.txt", "w+") as file:
         proxies = file.read().split("\n")[:-1]
-    for item in proxy_list:
-        proxies.remove(item)
-    with open("proxy.txt", "w+"):
+        for item in proxy_list:
+            proxies.remove(item)
         file.writelines("%s\n" % proxy for proxy in proxies)
 
 
 def doTest():
-    inst = Proxy('proxy.txt')
+    inst = Proxy('/Users/libou/Code/Projects/WeiboTrendRecord/data_collection/proxy/proxy.txt')
     count = 0
     remove_list = []
-    for i in range(inst.get_proxies_num()):
+    for i in tqdm(range(inst.get_proxies_num())):
         proxy = inst.get_proxy()
-        url = "https://s.weibo.com/top/summary?cate=realtimehot"
+        # url = "https://s.weibo.com/top/summary?cate=realtimehot"
+        url = "https://www.baidu.com"
         if not test_proxy(proxy, url):
             count += 1
             print("Wrong Proxy: {}".format(proxy))
             remove_list.append(proxy)
             inst.delete_proxy(proxy)
-    # delete_proxy(remove_list)
+    delete_proxy(remove_list)
     print("Total Count of Wrong Proxies: {}".format(count))
-    print("Bad proxies have been removed.")
+    print("Bad proxies have been removed. {}".format(remove_list))
     print("# of rest available proxies: {}".format(inst.get_proxies_num()))
 
     # if inst.get_proxies_num() < 10:

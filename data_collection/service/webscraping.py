@@ -16,9 +16,9 @@ def scraping(proxy, data_dir, kafkaObj):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"}
 
     if proxy is None:
-        res = get(url, headers=headers)
+        res = get(url, headers=headers, timeout=2)
     else:
-        res = get(url, headers=headers, proxies=proxies)
+        res = get(url, headers=headers, proxies=proxies, timeout=2)
 
     if res.status_code != 200:
         code = res.status_code
@@ -60,7 +60,7 @@ def scraping(proxy, data_dir, kafkaObj):
             df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='w', index=None, header=True)
         else:
             df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='a', index=None, header=None)
-        logging.warning("Write Kafka Error, save files locally")
+        logging.warning("Write Kafka Error, save records locally")
 
     res.close()
     return code

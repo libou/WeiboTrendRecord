@@ -35,19 +35,21 @@ def main():
                         break
                     else:
                         times = times - 1
-                        inst_proxy.delete_proxy(proxy)
-                        proxy_count = inst_proxy.get_proxies_num()
+                        # inst_proxy.delete_proxy(proxy)
+                        # proxy_count = inst_proxy.get_proxies_num()
+                        # logging.warning(
+                        #     "Proxy ip:{} error! Use another proxy ip. Current # of proxy is {}".format(proxy,
+                        #                                                                                proxy_count))
                         logging.warning(
-                            "Proxy ip:{} error! Use another proxy ip. Current # of proxy is {}".format(proxy,
-                                                                                                       proxy_count))
+                            "Proxy ip:{} error! Use another proxy ip.".format(proxy))
                         logging.warning("Retry: {} times".format(times))
                         proxy = inst_proxy.get_proxy()
-                if proxy_count <= 5:
-                    logging.warning("The number of available proxy ip is {}".format(proxy_count))
-                    if mailObj is not None:
-                        mailObj.notification("The number of available proxy ip is {}".format(proxy_count))
-                    # TODO: 重新爬取代理ip
+                if proxy_count <= 5 or times < 0:
+                    # logging.warning("The number of available proxy ip is {}".format(proxy_count))
+                    # if mailObj is not None:
+                    #     mailObj.notification("The number of available proxy ip is {}".format(proxy_count))
                     # inst_proxy = Proxy("proxy/proxy.txt")
+                    logging.warning("Retry: over 3 times. Scraping without proxy!")
 
                     code = scraping(None, data_dir, kafka_obj)
 
