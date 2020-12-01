@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import pandas as pd
 import os
+import json
 
 
 def scraping(proxy, data_dir, kafkaObj):
@@ -53,14 +54,20 @@ def scraping(proxy, data_dir, kafkaObj):
     df = pd.DataFrame(result, columns=['time', 'rank', 'title', 'count'])
     # write kafka
     msg = df.to_json(orient='records')
-    code = kafkaObj.send(msg)
-    if code != 200:
-        # kafka写入失败：写入本地备份并通知异常
-        if not os.path.exists(os.path.join(data_dir, filename, "record.csv")):
-            df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='w', index=None, header=True)
-        else:
-            df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='a', index=None, header=None)
-        logging.warning("Write Kafka Error, save records locally")
+    # 逐行发送
+    jsonList = json.loads(msg)
+    code = 200
+    for jsonElement in jsonList:
+        msg = json.dumps(jsonElement)
+        code = kafkaObj.send(msg)
+        if code != 200:
+            # kafka写入失败：写入本地备份并通知异常
+            if not os.path.exists(os.path.join(data_dir, filename, "record.csv")):
+                df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='w', index=None, header=True)
+            else:
+                df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='a', index=None, header=None)
+            logging.warning("Write Kafka Error, save records locally")
+    logging.info("Write Kafka successfully")
 
     res.close()
     return code
