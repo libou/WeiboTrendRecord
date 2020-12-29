@@ -8,9 +8,19 @@ from datetime import datetime
 import pandas as pd
 import os
 import json
+import traceback
 
 
 def scraping(proxy, data_dir, kafkaObj):
+    """
+    Crawl data from the website
+    :param proxy: proxy ip
+    :param data_dir: directory of local records (used when failed to write Kafka)
+    :param kafkaObj: Kafka Object
+    :return: status code of writing Kafka, error message
+    """
+    log = logging.getLogger("webscraping_log")
+
     url = "https://s.weibo.com/top/summary?cate=realtimehot"
     proxies = {"http": proxy}
     headers = {
@@ -24,7 +34,9 @@ def scraping(proxy, data_dir, kafkaObj):
     if res.status_code != 200:
         code = res.status_code
         res.close()
-        return code
+        failMsg = "数据爬取异常"
+        log.error("数据爬取异常 Webscraping ERROR! code: {}".format(code))
+        return code, failMsg
 
     result = []
     content = res.content.decode('utf-8')
@@ -42,32 +54,53 @@ def scraping(proxy, data_dir, kafkaObj):
             count = td_set[1].span.text
         result.append([datetime.now().strftime('%Y-%m-%d %H:%M:%S'), rank, title, count])
     result.pop(0)
-
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
-    year = str(datetime.now().year)
-    month = str(datetime.now().month)
-    filename = "_".join([year, month])
-    if not os.path.exists(os.path.join(data_dir, filename)):
-        os.mkdir(os.path.join(data_dir, filename))
+    res.close()
 
     df = pd.DataFrame(result, columns=['time', 'rank', 'title', 'count'])
+    df['rank'] = df['rank'].astype("int")
+    df['count'] = df['count'].astype("long")
     # write kafka
     msg = df.to_json(orient='records')
+    return sendMsg(data_dir, kafkaObj, msg, df)
+
+
+def sendMsg(data_dir, kafkaObj, msgList, df):
+    """
+    Send records to Kafka topic
+    :param data_dir: directory of local records (used when failed to write Kafka)
+    :param kafkaObj: Kafka Object
+    :param msg: records in json format
+    :param df: dataframe of records
+    :return: status code of writing Kafka, error message
+    """
+    log = logging.getLogger("webscraping_log")
+
+    jsonList = json.loads(msgList)
+    finalCode = 200
+    failedMsg = None
     # 逐行发送
-    jsonList = json.loads(msg)
-    code = 200
     for jsonElement in jsonList:
         msg = json.dumps(jsonElement)
         code = kafkaObj.send(msg)
         if code != 200:
-            # kafka写入失败：写入本地备份并通知异常
-            if not os.path.exists(os.path.join(data_dir, filename, "record.csv")):
-                df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='w', index=None, header=True)
+            finalCode = code
+            # kafka写入失败：写入本地备份
+            year = str(datetime.now().year)
+            month = str(datetime.now().month)
+            filename = "_".join([year, month])
+            try:
+                if not os.path.exists(os.path.join(data_dir, filename)):
+                    os.mkdir(os.path.join(data_dir, filename))
+                if not os.path.exists(os.path.join(data_dir, filename, "record.csv")):
+                    df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='w', index=None, header=True)
+                else:
+                    df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='a', index=None, header=None)
+            except Exception as e:
+                failedMsg = "kafka写入失败，同时保存本地文件异常"
+                log.error("kafka写入失败，同时保存本地文件异常：{}".format(traceback.format_exc()) )
             else:
-                df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='a', index=None, header=None)
-            logging.warning("Write Kafka Error, save records locally")
-    logging.info("Write Kafka successfully")
-
-    res.close()
-    return code
+                failedMsg = "kafka写入失败, 已成功保存本地文件"
+                log.warning("kafka写入失败, 已成功保存本地文件")
+    if finalCode == 200:
+        log.info("单次数据记录写入kafka成功")
+    return finalCode, failedMsg

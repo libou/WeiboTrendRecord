@@ -10,6 +10,8 @@ from time import sleep
 import configparser
 from proxy.proxy_pool import Proxy
 from tools.kafka_configuration import KafkaObj
+import traceback
+from tools.logging import init_log
 
 
 def main():
@@ -19,19 +21,18 @@ def main():
             now = datetime.now()
             if 2 <= now.hour <= 5:
                 sleep(1)
-            elif now.minute % 30 == 0:
+            elif now.minute % interval == 0:
                 proxy = inst_proxy.get_proxy()
                 proxy_count = inst_proxy.get_proxies_num()
                 times = 3
                 while proxy_count > 5 and times >= 0:
-                    code = scraping(proxy, data_dir, kafka_obj)
+                    code, failedMsg = scraping(proxy, data_dir, kafka_obj)
                     if code == 200:
-                        # logging.info("Crawled one record successfully.")
                         break
                     elif code == 9092:
                         # kafka写入异常
                         if mailObj is not None:
-                            mailObj.notification("Write Kafka ERROR! code: {}".format(code))
+                            mailObj.notification("Write Kafka ERROR! code: {}, msg: {}".format(code, failedMsg))
                         break
                     else:
                         times = times - 1
@@ -40,38 +41,37 @@ def main():
                         # logging.warning(
                         #     "Proxy ip:{} error! Use another proxy ip. Current # of proxy is {}".format(proxy,
                         #                                                                                proxy_count))
-                        logging.warning(
-                            "Proxy ip:{} error! Use another proxy ip.".format(proxy))
-                        logging.warning("Retry: {} times".format(times))
+                        log.warning(
+                            "Proxy ip:{} error! Use another proxy ip. Code: {}".format(proxy, code))
+                        log.warning("Retry: {} times".format(times))
                         proxy = inst_proxy.get_proxy()
-                if proxy_count <= 5 or times < 0:
+                if proxy_count <= 5 or times <= 0:
                     # logging.warning("The number of available proxy ip is {}".format(proxy_count))
                     # if mailObj is not None:
                     #     mailObj.notification("The number of available proxy ip is {}".format(proxy_count))
                     # inst_proxy = Proxy("proxy/proxy.txt")
-                    logging.warning("Retry: over 3 times. Scraping without proxy!")
+                    log.warning("Retry: over 3 times. Scraping without proxy!")
 
-                    code = scraping(None, data_dir, kafka_obj)
+                    code, failedMsg = scraping(None, data_dir, kafka_obj)
 
                     if code == 9092:
                         if mailObj is not None:
-                            mailObj.notification("Write Kafka ERROR! code: {}".format(code))
+                            mailObj.notification("Write Kafka ERROR! code: {}, msg: {}".format(code, failedMsg))
                         sleep(61)
                         continue
 
                     if code != 200:
-                        logging.error("Webscraping ERROR! code: {}".format(code))
                         if mailObj is not None:
-                            mailObj.notification("Webscraping ERROR! code: {}".format(code))
+                            mailObj.notification("Webscraping ERROR! code: {}, msg: {}".format(code, failedMsg))
                         sleep(61)
                         continue
                 sleep(61)
             else:
                 sleep(1)
     except Exception as e:
-        logging.error(e)
+        log.error("程序内部错误，error: {}".format(traceback.format_exc()))
         if mailObj is not None:
-            mailObj.notification("Error! Please check the log")
+            mailObj.notification("Error! Please check the log. Error: {}".format(e))
 
 
 if __name__ == '__main__':
@@ -81,6 +81,9 @@ if __name__ == '__main__':
 
     conf = configparser.ConfigParser()
     conf.read(config_file)
+
+    # 每小时内interval倍数的分钟时刻进行数据爬取（默认30）
+    interval = int(conf.get("web_scraping", "interval"))
 
     # 邮件通知配置
     sender = conf.get("notification", "sender")
@@ -101,12 +104,16 @@ if __name__ == '__main__':
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    logging.basicConfig(level=logging.INFO,
-                        filename=os.path.join(log_dir, 'web_scraping.log'),
-                        format=
-                        '%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
-                        )
-    logging.info("WeiboTrendRecord launching")
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+
+    log = init_log(log_dir)
+    # logging.basicConfig(level=logging.INFO,
+    #                     filename=os.path.join(log_dir, 'web_scraping.log'),
+    #                     format=
+    #                     '%(asctime)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+    #                     )
+    log.info("WeiboTrendRecord launching")
 
     inst_proxy = Proxy("proxy/proxy.txt")
     mailObj = Notification(sender, pw, receiver)

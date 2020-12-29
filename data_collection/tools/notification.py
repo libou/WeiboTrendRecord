@@ -8,6 +8,7 @@ from email.mime.text import MIMEText
 
 class Notification(object):
     _instance = None
+    _log = None
 
     def __new__(cls, sender, pw, receiver):
         if not isinstance(cls._instance, cls):
@@ -15,6 +16,7 @@ class Notification(object):
             cls._instance._sender = sender
             cls._instance._pw = pw
             cls._instance._receiver = receiver
+            cls._instance._log = logging.getLogger("webscraping_log")
         return cls._instance
 
     def notification(self, content):
@@ -32,7 +34,7 @@ class Notification(object):
             smtpObj.sendmail(self._sender, self._receiver, message.as_string())
             print("邮件发送成功")
             smtpObj.close()
-            logging.info("Notification sended successfully")
+            self._log.info("Notification sended successfully")
         except smtplib.SMTPException as e:
             print(e)
-            logging.error("Error: Sending Notification - {}".format(e))
+            self._log.error("Error: Sending Notification - {}".format(e))
