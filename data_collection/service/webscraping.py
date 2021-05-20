@@ -57,6 +57,8 @@ def scraping(proxy, data_dir, kafkaObj):
     res.close()
 
     df = pd.DataFrame(result, columns=['time', 'rank', 'title', 'count'])
+    # TODO: 直接判断rank是否为数字
+    df = df[df['rank'] != '•']
     df['rank'] = df['rank'].astype("int")
     df['count'] = df['count'].astype("long")
     # write kafka
