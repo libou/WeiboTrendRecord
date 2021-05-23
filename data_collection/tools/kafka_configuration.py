@@ -13,8 +13,9 @@ class KafkaObj(object):
                  value_serializer=lambda m: json.dumps(m).encode()):
         self._server = server
         self._topic = topic
-        self._producer = KafkaProducer(bootstrap_servers=server,
-                                       value_serializer=value_serializer)
+        self._producer = KafkaProducer(bootstrap_servers=[server],
+                                       value_serializer=value_serializer,
+                                       api_version=(0, 10, 1))
         self._log = logging.getLogger("webscraping_log")
 
     def getTopic(self):

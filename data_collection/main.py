@@ -1,6 +1,8 @@
+# coding=utf-8
 """
 This program is used for crawling daily hot topics on Weibo
 """
+
 import os
 import logging
 from tools.notification import Notification

@@ -81,6 +81,7 @@ def sendMsg(data_dir, kafkaObj, msgList, df):
     finalCode = 200
     failedMsg = None
     # 逐行发送
+    print(jsonList)
     for jsonElement in jsonList:
         msg = json.dumps(jsonElement)
         code = kafkaObj.send(msg)
