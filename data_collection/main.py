@@ -18,8 +18,8 @@ from tools.logging import init_log
 
 def main():
     global inst_proxy
-    try:
-        while True:
+    while True:
+        try:
             now = datetime.now()
             if 2 <= now.hour <= 5:
                 sleep(1)
@@ -74,10 +74,10 @@ def main():
                 sleep(61)
             else:
                 sleep(1)
-    except Exception as e:
-        log.error("程序内部错误，error: {}".format(traceback.format_exc()))
-        if mailObj is not None:
-            mailObj.notification("Error! Please check the log. Error: {}".format(e))
+        except Exception as e:
+            log.error("程序内部错误，error: {}".format(traceback.format_exc()))
+            if mailObj is not None:
+                mailObj.notification("Error! Please check the log. Error: {}".format(e))
 
 
 if __name__ == '__main__':

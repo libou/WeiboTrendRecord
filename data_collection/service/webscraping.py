@@ -32,6 +32,7 @@ def scraping(proxy, data_dir, kafkaObj, local=False):
     else:
         res = get(url, headers=headers, proxies=proxies, timeout=2)
 
+
     if res.status_code != 200:
         code = res.status_code
         res.close()
