@@ -9,7 +9,7 @@ ENV LANG C.UTF-8
 COPY requirements.txt .
 COPY config.ini .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 RUN echo Asia/Shanghai >> /etc/timezone && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
