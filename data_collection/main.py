@@ -28,7 +28,11 @@ def main():
                 proxy_count = inst_proxy.get_proxies_num()
                 times = 3
                 while proxy_count > 5 and times >= 0:
-                    code, failedMsg = scraping(proxy, data_dir, kafka_obj)
+                    if times == 3:
+                        local = True
+                    else:
+                        local = False
+                    code, failedMsg = scraping(proxy, data_dir, kafka_obj, local)
                     if code == 200:
                         break
                     elif code == 9092:

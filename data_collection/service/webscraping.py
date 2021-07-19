@@ -11,12 +11,13 @@ import json
 import traceback
 
 
-def scraping(proxy, data_dir, kafkaObj):
+def scraping(proxy, data_dir, kafkaObj, local=False):
     """
     Crawl data from the website
     :param proxy: proxy ip
     :param data_dir: directory of local records (used when failed to write Kafka)
     :param kafkaObj: Kafka Object
+    :param local: Whether save failed records locally
     :return: status code of writing Kafka, error message
     """
     log = logging.getLogger("webscraping_log")
@@ -66,13 +67,14 @@ def scraping(proxy, data_dir, kafkaObj):
     return sendMsg(data_dir, kafkaObj, msg, df)
 
 
-def sendMsg(data_dir, kafkaObj, msgList, df):
+def sendMsg(data_dir, kafkaObj, msgList, df, local=False):
     """
     Send records to Kafka topic
     :param data_dir: directory of local records (used when failed to write Kafka)
     :param kafkaObj: Kafka Object
     :param msg: records in json format
     :param df: dataframe of records
+    :param local: Whether save failed records locally
     :return: status code of writing Kafka, error message
     """
     log = logging.getLogger("webscraping_log")
@@ -88,6 +90,8 @@ def sendMsg(data_dir, kafkaObj, msgList, df):
         if code != 200:
             finalCode = code
             # kafka写入失败：写入本地备份
+            if local:
+                break
             year = str(datetime.now().year)
             month = str(datetime.now().month)
             filename = "_".join([year, month])
@@ -100,7 +104,7 @@ def sendMsg(data_dir, kafkaObj, msgList, df):
                     df.to_csv(os.path.join(data_dir, filename, "record.csv"), mode='a', index=None, header=None)
             except Exception as e:
                 failedMsg = "kafka写入失败，同时保存本地文件异常"
-                log.error("kafka写入失败，同时保存本地文件异常：{}".format(traceback.format_exc()) )
+                log.error("kafka写入失败，同时保存本地文件异常：{}".format(traceback.format_exc()))
             else:
                 failedMsg = "kafka写入失败, 已成功保存本地文件"
                 log.warning("kafka写入失败, 已成功保存本地文件")
