@@ -55,6 +55,7 @@ def scraping(proxy, data_dir, kafkaObj, local=False):
 
         countStr = td_set[1].span
         category = None
+        count = 0
         if td_set[1].span is None:
             count = 0
         else:
@@ -62,8 +63,12 @@ def scraping(proxy, data_dir, kafkaObj, local=False):
             if  countStr.strip().isdigit():
                 count = countStr.strip()
             else:
-                count = re.findall(r'\d+', countStr.strip())[0]
-                category = re.findall(r'\D+', countStr.strip())[0].strip()
+                countList = re.findall(r'\d+', countStr.strip())
+                if len(countList) is not 0:
+                    count = countList[0].strip()
+                categoryList = re.findall(r'\D+', countStr.strip())
+                if len(categoryList) is not 0:
+                    category = categoryList[0].strip()
         result.append([datetime.now().strftime('%Y-%m-%d %H:%M:%S'), rank, title, count, category])
     result.pop(0)
     res.close()
