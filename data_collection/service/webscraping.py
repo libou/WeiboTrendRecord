@@ -10,6 +10,8 @@ import os
 import json
 import traceback
 
+import re
+
 
 def scraping(proxy, data_dir, kafkaObj, local=False):
     """
@@ -50,15 +52,23 @@ def scraping(proxy, data_dir, kafkaObj, local=False):
         td_set = tr.find_all("td")
         rank = td_set[0].text
         title = td_set[1].a.text
+
+        countStr = td_set[1].span
+        category = None
         if td_set[1].span is None:
             count = 0
         else:
-            count = td_set[1].span.text
-        result.append([datetime.now().strftime('%Y-%m-%d %H:%M:%S'), rank, title, count])
+            countStr = td_set[1].span.text
+            if  countStr.strip().isdigit():
+                count = countStr.strip()
+            else:
+                count = re.findall(r'\d+', countStr.strip())[0]
+                category = re.findall(r'\D+', countStr.strip())[0].strip()
+        result.append([datetime.now().strftime('%Y-%m-%d %H:%M:%S'), rank, title, count, category])
     result.pop(0)
     res.close()
 
-    df = pd.DataFrame(result, columns=['time', 'rank', 'title', 'count'])
+    df = pd.DataFrame(result, columns=['time', 'rank', 'title', 'count', 'category'])
     # TODO: 直接判断rank是否为数字
     df = df[df['rank'] != '•']
     df['rank'] = df['rank'].astype("int")
