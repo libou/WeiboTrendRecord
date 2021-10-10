@@ -9,11 +9,12 @@ import pandas as pd
 import os
 import json
 import traceback
+import configparser
 
 import re
 
 
-def scraping(proxy, data_dir, kafkaObj, local=False):
+def scraping(proxy, data_dir, kafkaObj, cookie, local=False):
     """
     Crawl data from the website
     :param proxy: proxy ip
@@ -28,6 +29,8 @@ def scraping(proxy, data_dir, kafkaObj, local=False):
     proxies = {"http": proxy}
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"}
+    if cookie is not None:
+        headers["Cookie"] = cookie
 
     if proxy is None:
         res = get(url, headers=headers, timeout=2)

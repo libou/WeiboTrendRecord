@@ -9,6 +9,7 @@ from tools.notification import Notification
 from service.webscraping import scraping
 from datetime import datetime
 from time import sleep
+from time import time
 import configparser
 from proxy.proxy_pool import Proxy
 from tools.kafka_configuration import KafkaObj
@@ -18,6 +19,8 @@ from tools.logging import init_log
 
 def main():
     global inst_proxy
+    global cookie
+    lastTime = None
     while True:
         try:
             now = datetime.now()
@@ -32,7 +35,7 @@ def main():
                         local = True
                     else:
                         local = False
-                    code, failedMsg = scraping(proxy, data_dir, kafka_obj, local)
+                    code, failedMsg = scraping(proxy, data_dir, kafka_obj, cookie, local)
                     if code == 200:
                         break
                     elif code == 9092:
@@ -76,8 +79,10 @@ def main():
                 sleep(1)
         except Exception as e:
             log.error("程序内部错误，error: {}".format(traceback.format_exc()))
-            if mailObj is not None:
-                mailObj.notification("Error! Please check the log. Error: {}".format(e))
+            if lastTime is None or (time() - lastTime) > 600:
+                if mailObj is not None:
+                    mailObj.notification("Error! Please check the log. Error: {}".format(e))
+                    lastTime = time()
 
 
 if __name__ == '__main__':
@@ -107,6 +112,9 @@ if __name__ == '__main__':
     kafka_topic = conf.get("kafka", "topic")
     kafka_obj = KafkaObj(kafka_server, kafka_topic)
 
+    # 获取cookie
+    cookie = conf.get("web_scraping", "cookie")
+
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
@@ -123,6 +131,6 @@ if __name__ == '__main__':
 
     inst_proxy = Proxy("proxy/proxy.txt")
     mailObj = Notification(sender, pw, receiver)
-    if "../config-template.ini" is config_file :
+    if "../config-template.ini" is config_file:
         mailObj = None
     main()
